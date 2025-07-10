@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>使用者管理</h2>
+    <a href="{{ url_for('user_management.add_user') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> 新增使用者
+    </a>
+</div>
+
+<!-- 搜尋表單 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-8">
+                <input type="text" class="form-control" name="search" 
+                       placeholder="搜尋使用者名稱..." value="{{ search }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-search"></i> 搜尋
+                </button>
+                <a href="{{ url_for('user_management.list_users') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> 清除
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if users.items %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>使用者名稱</th>
+                        <th>角色</th>
+                        <th>關聯ID</th>
+                        <th>狀態</th>
+                        <th>最後登錄</th>
+                        <th>創建時間</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users.items %}
+                    <tr>
+                        <td>{{ user.user_id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>
+                            {% if user.role == 'admin' %}
+                                <span class="badge bg-danger">管理員</span>
+                            {% elif user.role == 'teacher' %}
+                                <span class="badge bg-info">教師</span>
+                            {% elif user.role == 'student' %}
+                                <span class="badge bg-success">學生</span>
+                            {% else %}
+                                <span class="badge bg-secondary">職員</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.related_id or '-' }}</td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="badge bg-success">啟用</span>
+                            {% else %}
+                                <span class="badge bg-secondary">停用</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '-' }}</td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('user_management.view_user', user_id=user.user_id) }}" 
+                                   class="btn btn-sm btn-info" title="檢視">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('user_management.edit_user', user_id=user.user_id) }}" 
+                                   class="btn btn-sm btn-warning" title="編輯">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('user_management.change_password', user_id=user.user_id) }}" 
+                                   class="btn btn-sm btn-secondary" title="重設密碼">
+                                    <i class="fas fa-key"></i>
+                                </a>
+                                {% if user.user_id != current_user.user_id %}
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="confirmDelete('{{ user.username }}', {{ user.user_id }})" title="刪除">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分頁 -->
+        {% if users.pages > 1 %}
+        <nav aria-label="使用者列表分頁">
+            <ul class="pagination justify-content-center">
+                {% if users.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user_management.list_users', page=users.prev_num, search=search) }}">上一頁</a>
+                </li>
+                {% endif %}
+                
+                {% for page_num in users.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != users.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('user_management.list_users', page=page_num, search=search) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if users.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user_management.list_users', page=users.next_num, search=search) }}">下一頁</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> 
+            {% if search %}
+                沒有找到符合條件的使用者
+            {% else %}
+                暫無使用者資料
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 刪除確認模態框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">確認刪除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>您確定要刪除使用者 <strong id="deleteUsername"></strong> 嗎？</p>
+                <p class="text-danger">此操作無法復原！</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">確認刪除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(username, userId) {
+    document.getElementById('deleteUsername').textContent = username;
+    document.getElementById('deleteForm').action = '/users/' + userId + '/delete';
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

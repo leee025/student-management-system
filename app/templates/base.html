@@ -1,0 +1,198 @@
+<!--
+基礎模板 (base.html)
+所有頁面的共同模板，包含：
+- HTML文檔結構
+- 導航欄
+- 頁面標題
+- CSS和JavaScript引用
+- 消息閃現區域
+- 頁腳
+-->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <!-- 基本元數據 -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 動態頁面標題 -->
+    <title>{{ title }} - 學生管理系統</title>
+
+    <!-- Bootstrap CSS框架 - 提供響應式佈局和組件樣式 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome圖標庫 - 提供各種圖標 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Flatpickr日期選擇器樣式 - 用於日期輸入字段 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- 子模板可以在此區塊添加額外的CSS或meta標籤 -->
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- 頂部導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <!-- 網站品牌/標題，點擊返回首頁 -->
+            <a class="navbar-brand" href="{{ url_for('index') }}">學生管理系統</a>
+
+            <!-- 移動設備上的導航切換按鈕 -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- 可折疊的導航菜單 -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- 左側導航鏈接 -->
+                <ul class="navbar-nav me-auto">
+                    <!-- 根據用戶角色顯示相應的管理功能 -->
+                    {% if current_user.is_authenticated %}
+                        <!-- 管理員可以看到所有功能 -->
+                        {% if current_user.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('class_management.list_classes') }}">班級管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('student_management.list_students') }}">學生管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('teacher_management.list_teachers') }}">教師管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('user_management.list_users') }}">用戶管理</a>
+                        </li>
+
+                        <!-- 教師可以看到班級和學生管理 -->
+                        {% elif current_user.role == 'teacher' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('class_management.list_classes') }}">班級管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('student_management.list_students') }}">學生管理</a>
+                        </li>
+
+                        <!-- 學生只能看到自己相關的功能 -->
+                        {% elif current_user.role == 'student' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('student_management.view_student', student_id=current_user.related_id) }}">我的資料</a>
+                        </li>
+                        {% if current_user.related_id %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('class_management.my_class') }}">我的班級</a>
+                        </li>
+                        {% endif %}
+
+                        <!-- 職員角色的功能（可根據需要調整） -->
+                        {% elif current_user.role == 'staff' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('class_management.list_classes') }}">班級查詢</a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+
+                <!-- 中間搜尋欄 -->
+                {% if current_user.is_authenticated %}
+                <div class="d-flex mx-3">
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text"
+                               class="form-control"
+                               id="navSearchInput"
+                               placeholder="搜尋學生、教師、班級..."
+                               style="font-size: 0.9em;">
+                        <button class="btn btn-outline-light" type="button" onclick="goToGlobalSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{ current_user.username }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('user_management.view_user', user_id=current_user.user_id) }}">
+                                <i class="fas fa-user-circle"></i> 個人資料
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user_management.change_password', user_id=current_user.user_id) }}">
+                                <i class="fas fa-key"></i> 變更密碼
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="fas fa-sign-out-alt"></i> 登出
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">登入</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">註冊</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+            {% if category == 'success' %}
+                <i class="fas fa-check-circle"></i>
+            {% elif category == 'danger' or category == 'error' %}
+                <i class="fas fa-exclamation-triangle"></i>
+            {% elif category == 'warning' %}
+                <i class="fas fa-exclamation-circle"></i>
+            {% else %}
+                <i class="fas fa-info-circle"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- 全局搜尋功能 -->
+    <script>
+    function goToGlobalSearch() {
+        const query = document.getElementById('navSearchInput').value.trim();
+        if (query) {
+            window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        } else {
+            window.location.href = '/search';
+        }
+    }
+
+    // 導航欄搜尋框回車事件
+    document.addEventListener('DOMContentLoaded', function() {
+        const navSearchInput = document.getElementById('navSearchInput');
+        if (navSearchInput) {
+            navSearchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    goToGlobalSearch();
+                }
+            });
+        }
+    });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ title }}</h2>
+    <div>
+        <a href="{{ url_for('class_management.edit_class', class_id=class_obj.class_id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> 編輯
+        </a>
+        <form method="post" action="{{ url_for('class_management.delete_class', class_id=class_obj.class_id) }}" 
+              class="d-inline" onsubmit="return confirm('確定要刪除該班級嗎？');">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> 刪除
+            </button>
+        </form>
+        <a href="{{ url_for('class_management.list_classes') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- 班級基本信息 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>班級信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>班級ID：</strong>{{ class_obj.class_id }}</p>
+                        <p><strong>班級名稱：</strong>{{ class_obj.class_name }}</p>
+                        <p><strong>年級：</strong>{{ class_obj.grade }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>所屬院系：</strong>{{ class_obj.department.department_name if class_obj.department else '未設置' }}</p>
+                        <p><strong>班主任：</strong>{{ class_obj.teacher.name if class_obj.teacher else '未設置' }}</p>
+                        <p><strong>學生人數：</strong>{{ class_obj.students|length }}</p>
+                    </div>
+                </div>
+                {% if class_obj.created_at %}
+                <p><strong>創建時間：</strong>{{ class_obj.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                {% endif %}
+                {% if class_obj.updated_at %}
+                <p><strong>更新時間：</strong>{{ class_obj.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 班級學生列表 -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i>班級學生</h5>
+                <a href="{{ url_for('class_management.class_students', class_id=class_obj.class_id) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-list"></i> 查看完整列表
+                </a>
+            </div>
+            <div class="card-body">
+                {% if class_obj.students %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>學號</th>
+                                <th>姓名</th>
+                                <th>性別</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in class_obj.students[:10] %}
+                            <tr>
+                                <td>{{ student.student_id }}</td>
+                                <td>{{ student.name }}</td>
+                                <td>{{ student.gender }}</td>
+                                <td>{{ student.status }}</td>
+                                <td>
+                                    <a href="{{ url_for('student_management.view_student', student_id=student.student_id) }}" 
+                                       class="btn btn-sm btn-info" title="檢視">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if class_obj.students|length > 10 %}
+                    <p class="text-muted">顯示前10名學生，<a href="{{ url_for('class_management.class_students', class_id=class_obj.class_id) }}">查看全部</a></p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">該班級暫無學生</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- 快速操作 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>快速操作</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('student_management.add_student') }}?class_id={{ class_obj.class_id }}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-plus"></i> 新增學生到此班級
+                    </a>
+                    <a href="{{ url_for('class_management.class_students', class_id=class_obj.class_id) }}" class="btn btn-outline-info">
+                        <i class="fas fa-list"></i> 管理班級學生
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

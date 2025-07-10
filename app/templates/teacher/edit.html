@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ title }}</h2>
+    <a href="{{ url_for('teacher_management.list_teachers') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 返回列表
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>基本資訊</h4>
+                    <div class="form-group">
+                        {{ form.teacher_id.label }}
+                        {{ form.teacher_id(class="form-control") }}
+                        {% for error in form.teacher_id.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.name.label }}
+                        {{ form.name(class="form-control") }}
+                        {% for error in form.name.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.gender.label }}
+                        {{ form.gender(class="form-control") }}
+                        {% for error in form.gender.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.birth_date.label }}
+                        {{ form.birth_date(class="form-control") }}
+                        {% for error in form.birth_date.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.id_number.label }}
+                        {{ form.id_number(class="form-control") }}
+                        {% for error in form.id_number.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h4>聯繫方式</h4>
+                    <div class="form-group">
+                        {{ form.address.label }}
+                        {{ form.address(class="form-control") }}
+                        {% for error in form.address.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.phone.label }}
+                        {{ form.phone(class="form-control") }}
+                        {% for error in form.phone.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.email.label }}
+                        {{ form.email(class="form-control") }}
+                        {% for error in form.email.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.department.label }}
+                        {{ form.department(class="form-control") }}
+                        {% for error in form.department.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.position.label }}
+                        {{ form.position(class="form-control") }}
+                        {% for error in form.position.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 儲存
+                </button>
+                {% if teacher %}
+                <a href="{{ url_for('teacher_management.view_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-secondary">
+                    取消
+                </a>
+                {% else %}
+                <a href="{{ url_for('teacher_management.list_teachers') }}" class="btn btn-secondary">
+                    取消
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

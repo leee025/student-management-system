@@ -1,0 +1,308 @@
+/* Dashboard 自定義樣式 */
+
+/* 統計卡片樣式 */
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card.students {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stats-card.teachers {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stats-card.classes {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.stats-card.users {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.stats-card.departments {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.stats-card .card-body {
+    padding: 2rem;
+}
+
+.stats-card .stats-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.stats-card .stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .stats-label {
+    font-size: 1rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 圖表容器樣式 */
+.chart-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-container h5 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+/* 快速操作按鈕 */
+.quick-action-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    display: block;
+    text-align: center;
+}
+
+.quick-action-btn:hover {
+    border-color: #007bff;
+    color: #007bff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
+    text-decoration: none;
+}
+
+.quick-action-btn i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.quick-action-btn .action-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.quick-action-btn .action-desc {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* 最近活動列表 */
+.recent-activity {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.recent-activity h5 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.activity-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: #007bff;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* 歡迎區域 */
+.welcome-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.welcome-section h1 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+}
+
+.welcome-section p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .stats-card .stats-number {
+        font-size: 2rem;
+    }
+
+    .stats-card .stats-icon {
+        font-size: 2.5rem;
+    }
+
+    .welcome-section h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-section {
+        padding: 2rem 1rem;
+    }
+
+    .chart-container,
+    .recent-activity {
+        padding: 1.5rem;
+    }
+
+    .quick-action-btn {
+        padding: 1rem;
+    }
+
+    .quick-action-btn i {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .stats-card .stats-number {
+        font-size: 1.8rem;
+    }
+
+    .stats-card .stats-icon {
+        font-size: 2rem;
+    }
+
+    .welcome-section h1 {
+        font-size: 1.8rem;
+    }
+
+    .welcome-section p {
+        font-size: 1rem;
+    }
+
+    .chart-container,
+    .recent-activity {
+        padding: 1rem;
+    }
+
+    .quick-action-btn {
+        padding: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .quick-action-btn .action-title {
+        font-size: 0.9rem;
+    }
+
+    .quick-action-btn .action-desc {
+        font-size: 0.8rem;
+    }
+}
+
+/* 動畫效果 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* 進度條樣式 */
+.progress-modern {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.progress-modern .progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* 狀態徽章 */
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-badge.inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}

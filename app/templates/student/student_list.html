@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>學生列表</h2>
+    <div>
+        <a href="{{ url_for('search.global_search') }}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-search"></i> 高級搜尋
+        </a>
+        <a href="{{ url_for('student_management.add_student') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 新增學生
+        </a>
+    </div>
+</div>
+
+<!-- 快速搜尋欄 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text"
+                       class="form-control"
+                       name="search"
+                       value="{{ request.args.get('search', '') }}"
+                       placeholder="搜尋學號、姓名、郵箱...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status_filter">
+                    <option value="">所有狀態</option>
+                    <option value="在學" {% if request.args.get('status_filter') == '在學' %}selected{% endif %}>在學</option>
+                    <option value="休學" {% if request.args.get('status_filter') == '休學' %}selected{% endif %}>休學</option>
+                    <option value="畢業" {% if request.args.get('status_filter') == '畢業' %}selected{% endif %}>畢業</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> 搜尋
+                </button>
+                {% if request.args.get('search') or request.args.get('status_filter') %}
+                <a href="{{ url_for('student_management.list_students') }}" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-times"></i> 清除
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>學號</th>
+                    <th>姓名</th>
+                    <th>性別</th>
+                    <th>班級</th>
+                    <th>狀態</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students.items %}
+                <tr>
+                    <td>{{ student.student_id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.gender }}</td>
+                    <td>{{ student.class_info.class_name if student.class_info }}</td>
+                    <td>{{ student.status }}</td>
+                    <td>
+                        <a href="{{ url_for('student_management.view_student', student_id=student.student_id) }}" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i> 檢視
+                        </a>
+                        <a href="{{ url_for('student_management.edit_student', student_id=student.student_id) }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> 編輯
+                        </a>
+                        <form method="post" action="{{ url_for('student_management.delete_student', student_id=student.student_id) }}" 
+                              class="d-inline" onsubmit="return confirm('確定要刪除該學生嗎？');">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash-alt"></i> 刪除
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">沒有學生數據</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if pagination.pages > 1 %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div>
+                顯示第 {{ pagination.page }} 頁，共 {{ pagination.pages }} 頁
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    <!-- 上一頁按鈕 -->
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('student_management.list_students', page=pagination.prev_num, search=search, status_filter=status_filter) if pagination.has_prev else '#' }}">
+                            <i class="fas fa-chevron-left"></i> 上一頁
+                        </a>
+                    </li>
+
+                    <!-- 頁碼按鈕 -->
+                    {% for page in pagination.iter_pages(left_edge=2, left_current=2, right_current=2, right_edge=2) %}
+                        {% if page %}
+                            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('student_management.list_students', page=page, search=search, status_filter=status_filter) }}">{{ page }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- 下一頁按鈕 -->
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('student_management.list_students', page=pagination.next_num, search=search, status_filter=status_filter) if pagination.has_next else '#' }}">
+                            下一頁 <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

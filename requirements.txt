@@ -1,0 +1,29 @@
+# Flask學生管理系統依賴包列表
+# 使用 pip install -r requirements.txt 安裝所有依賴
+
+# Flask核心框架
+Flask==2.3.3
+
+# Flask-SQLAlchemy：Flask的SQLAlchemy擴展，用於數據庫ORM操作
+Flask-SQLAlchemy==3.1.1
+
+# Flask-Login：用戶會話管理，處理用戶登錄、登出和會話保持
+Flask-Login==0.6.2
+
+# Flask-WTF：Flask的WTForms擴展，用於表單處理和CSRF保護
+Flask-WTF==1.1.1
+
+# email-validator：郵箱地址驗證器，用於驗證用戶輸入的郵箱格式
+email-validator==2.0.0
+
+# python-dotenv：載入.env環境變量文件
+python-dotenv==1.0.0
+
+# pymysql：Python的MySQL數據庫驅動
+pymysql==1.1.0
+
+# flask-migrate：Flask的數據庫遷移擴展，基於Alembic
+flask-migrate==4.1.0
+
+# Werkzeug：Flask的WSGI工具庫（指定相容版本）
+Werkzeug==2.3.7

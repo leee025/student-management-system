@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ title }}</h2>
+    <a href="{{ url_for('class_management.list_classes') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 返回列表
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.class_name.label(class="form-label") }}
+                    {{ form.class_name(class="form-control") }}
+                    {% if form.class_name.errors %}
+                        <div class="text-danger">
+                            {% for error in form.class_name.errors %}
+                                <small>{{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.grade.label(class="form-label") }}
+                    {{ form.grade(class="form-control") }}
+                    {% if form.grade.errors %}
+                        <div class="text-danger">
+                            {% for error in form.grade.errors %}
+                                <small>{{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.department_id.label(class="form-label") }}
+                    {{ form.department_id(class="form-select") }}
+                    {% if form.department_id.errors %}
+                        <div class="text-danger">
+                            {% for error in form.department_id.errors %}
+                                <small>{{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.teacher_id.label(class="form-label") }}
+                    {{ form.teacher_id(class="form-select") }}
+                    {% if form.teacher_id.errors %}
+                        <div class="text-danger">
+                            {% for error in form.teacher_id.errors %}
+                                <small>{{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end">
+                <a href="{{ url_for('class_management.list_classes') }}" class="btn btn-secondary me-2">取消</a>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

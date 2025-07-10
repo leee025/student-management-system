@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>老師列表</h2>
+    <div>
+        <a href="{{ url_for('search.global_search') }}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-search"></i> 高級搜尋
+        </a>
+        <a href="{{ url_for('teacher_management.add_teacher') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 新增老師
+        </a>
+    </div>
+</div>
+
+<!-- 快速搜尋欄 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text"
+                       class="form-control"
+                       name="search"
+                       value="{{ request.args.get('search', '') }}"
+                       placeholder="搜尋教師編號、姓名、郵箱...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="department_filter">
+                    <option value="">所有部門</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.department_id }}"
+                            {% if request.args.get('department_filter') == dept.department_id|string %}selected{% endif %}>
+                        {{ dept.department_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> 搜尋
+                </button>
+                {% if request.args.get('search') or request.args.get('department_filter') %}
+                <a href="{{ url_for('teacher_management.list_teachers') }}" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-times"></i> 清除
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>教師編號</th>
+                    <th>姓名</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                                    {% for teacher in teachers.items %}
+                <tr>
+                    <td>{{ teacher.teacher_id }}</td>
+                    <td>{{ teacher.name }}</td>
+                    <td>
+                        <a href="{{ url_for('teacher_management.view_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i> 檢視
+                        </a>
+                        <a href="{{ url_for('teacher_management.edit_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> 編輯
+                        </a>
+                        <form method="post" action="{{ url_for('teacher_management.delete_teacher', teacher_id=teacher.teacher_id) }}" 
+                              class="d-inline" onsubmit="return confirm('確定要刪除該老師嗎？');">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash-alt"></i> 刪除
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center">沒有老師數據</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- 分頁控件 -->
+        <nav aria-label="老師列表分頁" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if teachers.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('teacher_management.list_teachers', page=teachers.prev_num, search=search, department_filter=department_filter) }}" aria-label="上一頁">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">上一頁</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="上一頁">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">上一頁</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for page_num in teachers.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num == teachers.page %}
+                        <li class="page-item active">
+                            <a class="page-link" href="{{ url_for('teacher_management.list_teachers', page=page_num, search=search, department_filter=department_filter) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('teacher_management.list_teachers', page=page_num, search=search, department_filter=department_filter) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if teachers.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('teacher_management.list_teachers', page=teachers.next_num, search=search, department_filter=department_filter) }}" aria-label="下一頁">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">下一頁</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="下一頁">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">下一頁</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div class="text-center mt-2">
+            <small class="text-muted">
+                顯示第 {{ teachers.page }} 頁，共 {{ teachers.pages }} 頁，總計 {{ teachers.total }} 條記錄
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

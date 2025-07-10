@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask學生管理系統 - 專案架構與開發流程</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #34495e;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin: 30px 0 20px 0;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin: 20px 0 15px 0;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #27ae60;
+            margin: 15px 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .subsection {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        ul {
+            margin: 10px 0 10px 20px;
+        }
+        
+        li {
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3498db;
+        }
+        
+        .role-card {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .tech-item {
+            background: #3498db;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .flow-step {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .flow-step::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            background: #e74c3c;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .development-flow {
+            counter-reset: step-counter;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Flask學生管理系統</h1>
+        <h1 style="font-size: 1.8em; margin-top: -20px;">專案架構與開發流程指南</h1>
+        
+        <div class="section">
+            <h2>📋 專案概述</h2>
+            <p>這是一個基於Flask框架開發的完整學生管理系統，採用模組化設計和現代Web開發最佳實踐。系統支援多角色權限管理，提供學生、教師、班級和用戶的完整CRUD操作。</p>
+            
+            <div class="tech-stack">
+                <span class="tech-item">Flask 2.3.3</span>
+                <span class="tech-item">SQLAlchemy</span>
+                <span class="tech-item">Flask-Login</span>
+                <span class="tech-item">Flask-WTF</span>
+                <span class="tech-item">MySQL</span>
+                <span class="tech-item">Bootstrap</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🏗️ 專案結構</h2>
+            
+            <div class="subsection">
+                <h3>核心配置文件</h3>
+                <ul>
+                    <li><strong>config.py</strong> - 應用配置（數據庫連接、安全密鑰、分頁設置）</li>
+                    <li><strong>manage.py</strong> - 管理腳本（數據庫初始化、創建管理員）</li>
+                    <li><strong>requirements.txt</strong> - 依賴管理</li>
+                    <li><strong>run.py</strong> - 應用啟動入口</li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3>應用工廠模式</h3>
+                <ul>
+                    <li><strong>app/__init__.py</strong> - 應用創建、擴展初始化、藍圖註冊</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🗄️ 數據模型層</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>👤 User 用戶模型</h4>
+                    <ul>
+                        <li>用戶認證功能</li>
+                        <li>角色管理（admin/teacher/student/staff）</li>
+                        <li>密碼加密存儲</li>
+                        <li>會話管理</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🎓 Student 學生模型</h4>
+                    <ul>
+                        <li>學籍信息管理</li>
+                        <li>個人資料存儲</li>
+                        <li>班級關聯</li>
+                        <li>學習狀態追蹤</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>👨‍🏫 Teacher 教師模型</h4>
+                    <ul>
+                        <li>職員信息管理</li>
+                        <li>部門關聯</li>
+                        <li>班級管理權限</li>
+                        <li>教學資料</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🏫 Class 班級模型</h4>
+                    <ul>
+                        <li>班級基本信息</li>
+                        <li>師生關聯管理</li>
+                        <li>部門歸屬</li>
+                        <li>年級分類</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🏢 Department 部門模型</h4>
+                    <ul>
+                        <li>組織架構管理</li>
+                        <li>層級關係</li>
+                        <li>部門信息</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>⚙️ 業務邏輯層</h2>
+            
+            <div class="subsection">
+                <h3>🔐 認證模組 (app/auth/)</h3>
+                <ul>
+                    <li><strong>routes.py</strong> - 登錄/登出、用戶註冊、會話管理</li>
+                    <li><strong>forms.py</strong> - 登錄表單、註冊表單、字段驗證</li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3>🎓 學生管理 (app/student/)</h3>
+                <ul>
+                    <li><strong>routes.py</strong> - 學生CRUD操作、列表查看、詳情展示</li>
+                    <li><strong>forms.py</strong> - 學生信息表單、搜索表單、驗證規則</li>
+                    <li><strong>decorators.py</strong> - 權限控制、角色檢查、數據過濾</li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3>👨‍🏫 教師管理 (app/teacher/)</h3>
+                <ul>
+                    <li><strong>routes.py</strong> - 教師CRUD操作</li>
+                    <li><strong>forms.py</strong> - 教師表單管理</li>
+                    <li><strong>decorators.py</strong> - 權限裝飾器</li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3>🏫 班級管理 (app/classes/)</h3>
+                <ul>
+                    <li><strong>routes.py</strong> - 班級操作管理</li>
+                    <li><strong>forms.py</strong> - 班級表單處理</li>
+                    <li><strong>decorators.py</strong> - 訪問控制</li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3>👥 用戶管理 (app/user_management/)</h3>
+                <ul>
+                    <li><strong>routes.py</strong> - 用戶CRUD操作</li>
+                    <li><strong>forms.py</strong> - 用戶表單管理</li>
+                    <li><strong>decorators.py</strong> - 管理權限控制</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎨 前端展示層</h2>
+            
+            <div class="subsection">
+                <h3>📄 模板系統 (app/templates/)</h3>
+                <ul>
+                    <li><strong>base.html</strong> - 基礎模板（導航結構、樣式引入）</li>
+                    <li><strong>auth/</strong> - 認證頁面（登錄、註冊）</li>
+                    <li><strong>student/</strong> - 學生頁面（列表、詳情、表單）</li>
+                    <li><strong>teacher/</strong> - 教師管理頁面</li>
+                    <li><strong>classes/</strong> - 班級管理頁面</li>
+                    <li><strong>user_management/</strong> - 用戶管理頁面</li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3>📁 靜態資源 (app/static/)</h3>
+                <ul>
+                    <li>CSS樣式文件</li>
+                    <li>JavaScript腳本</li>
+                    <li>圖片資源</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔐 權限系統</h2>
+
+            <div class="feature-grid">
+                <div class="role-card">
+                    <h4>🔑 Admin 管理員</h4>
+                    <ul>
+                        <li>系統全部權限</li>
+                        <li>用戶管理</li>
+                        <li>系統配置</li>
+                        <li>數據維護</li>
+                    </ul>
+                </div>
+
+                <div class="role-card">
+                    <h4>👨‍🏫 Teacher 教師</h4>
+                    <ul>
+                        <li>班級管理權限</li>
+                        <li>學生信息管理</li>
+                        <li>教學相關功能</li>
+                        <li>有限系統訪問</li>
+                    </ul>
+                </div>
+
+                <div class="role-card">
+                    <h4>🎓 Student 學生</h4>
+                    <ul>
+                        <li>個人信息查看</li>
+                        <li>基本查詢權限</li>
+                        <li>受限系統訪問</li>
+                        <li>自身數據管理</li>
+                    </ul>
+                </div>
+
+                <div class="role-card">
+                    <h4>👥 Staff 職員</h4>
+                    <ul>
+                        <li>部分功能訪問</li>
+                        <li>輔助管理權限</li>
+                        <li>有限數據查看</li>
+                        <li>特定業務支持</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>權限控制機制</h3>
+                <ul>
+                    <li><strong>裝飾器模式</strong> - @admin_required, @teacher_required, @login_required</li>
+                    <li><strong>數據過濾</strong> - 按角色過濾、按關聯過濾、按權限過濾</li>
+                    <li><strong>訪問控制</strong> - 路由級別和數據級別的雙重保護</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section development-flow">
+            <h2>🚀 開發流程</h2>
+
+            <div class="flow-step">
+                <h3>環境準備</h3>
+                <div class="code-block">
+# 創建虛擬環境
+python -m venv venv
+
+# 激活虛擬環境 (Windows)
+venv\Scripts\activate
+
+# 安裝依賴
+pip install -r requirements.txt
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <h3>數據庫配置</h3>
+                <ul>
+                    <li>配置MySQL連接設置</li>
+                    <li>設置環境變量</li>
+                    <li>修改config.py中的數據庫連接字符串</li>
+                </ul>
+            </div>
+
+            <div class="flow-step">
+                <h3>初始化階段</h3>
+                <div class="code-block">
+# 初始化數據庫
+python manage.py init_db
+
+# 創建管理員賬戶
+python manage.py create_admin
+
+# 測試運行
+python run.py
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <h3>開發階段</h3>
+                <ul>
+                    <li><strong>模型設計</strong> - 定義數據結構、建立關聯關係</li>
+                    <li><strong>業務邏輯</strong> - 路由設計、表單處理、權限控制</li>
+                    <li><strong>前端開發</strong> - 模板設計、樣式美化、交互功能</li>
+                </ul>
+            </div>
+
+            <div class="flow-step">
+                <h3>測試部署</h3>
+                <ul>
+                    <li><strong>功能測試</strong> - 單元測試、集成測試、用戶測試</li>
+                    <li><strong>生產部署</strong> - 環境配置、數據遷移、服務啟動</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💡 技術特點</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🏗️ 架構模式</h4>
+                    <ul>
+                        <li><strong>工廠模式</strong> - 應用創建和配置管理</li>
+                        <li><strong>藍圖模式</strong> - 模組化設計和路由組織</li>
+                        <li><strong>MVC架構</strong> - 模型、視圖、控制器分離</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h4>🛡️ 安全機制</h4>
+                    <ul>
+                        <li><strong>密碼加密</strong> - Werkzeug哈希安全存儲</li>
+                        <li><strong>會話管理</strong> - Flask-Login和記住我功能</li>
+                        <li><strong>CSRF保護</strong> - Flask-WTF表單安全</li>
+                        <li><strong>權限控制</strong> - 角色驗證和數據隔離</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h4>📊 數據管理</h4>
+                    <ul>
+                        <li><strong>ORM映射</strong> - SQLAlchemy對象關係映射</li>
+                        <li><strong>數據遷移</strong> - Flask-Migrate版本控制</li>
+                        <li><strong>關聯查詢</strong> - 高效的數據庫查詢優化</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h4>🎨 用戶體驗</h4>
+                    <ul>
+                        <li><strong>響應式設計</strong> - 支持多設備訪問</li>
+                        <li><strong>表單驗證</strong> - 前後端雙重驗證</li>
+                        <li><strong>友好界面</strong> - 直觀的操作和清晰導航</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h3>🎯 核心優勢</h3>
+            <p>這個Flask學生管理系統展現了現代Web開發的最佳實踐，包括：</p>
+            <ul>
+                <li><strong>模組化設計</strong> - 每個功能獨立成藍圖，便於維護和擴展</li>
+                <li><strong>安全性考慮</strong> - 完整的認證授權機制和數據保護</li>
+                <li><strong>可維護性</strong> - 清晰的代碼結構和完善的文檔</li>
+                <li><strong>可擴展性</strong> - 靈活的架構設計支持功能擴展</li>
+                <li><strong>用戶友好</strong> - 直觀的界面設計和良好的用戶體驗</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>📚 學習建議</h2>
+            <ol>
+                <li><strong>理解Flask基礎</strong> - 掌握Flask框架的核心概念</li>
+                <li><strong>學習SQLAlchemy</strong> - 熟悉ORM操作和數據庫設計</li>
+                <li><strong>掌握藍圖模式</strong> - 理解模組化開發的優勢</li>
+                <li><strong>實踐權限控制</strong> - 學習安全開發的重要性</li>
+                <li><strong>優化用戶體驗</strong> - 關注前端設計和交互優化</li>
+            </ol>
+        </div>
+
+        <footer style="text-align: center; margin-top: 40px; padding: 20px; border-top: 2px solid #3498db; color: #7f8c8d;">
+            <p>📖 Flask學生管理系統架構文檔 | 🕒 生成時間: <span id="current-time"></span></p>
+        </footer>
+    </div>
+
+    <script>
+        // 顯示當前時間
+        document.getElementById('current-time').textContent = new Date().toLocaleString('zh-TW');
+
+        // 平滑滾動效果
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

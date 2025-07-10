@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ title }}</h2>
+    <div>
+        <a href="{{ url_for('student_management.edit_student', student_id=student.student_id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> 編輯
+        </a>
+        <form method="post" action="{{ url_for('student_management.delete_student', student_id=student.student_id) }}" 
+              class="d-inline" onsubmit="return confirm('確定要刪除該學生嗎？');">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> 刪除
+            </button>
+        </form>
+        <a href="{{ url_for('student_management.list_students') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- 學生基本信息 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>基本信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>學號：</strong>{{ student.student_id }}</p>
+                        <p><strong>姓名：</strong>{{ student.name }}</p>
+                        <p><strong>性別：</strong>{{ student.gender }}</p>
+                        <p><strong>出生日期：</strong>{{ student.birth_date.strftime('%Y-%m-%d') if student.birth_date else '未設置' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>身份證號：</strong>{{ student.id_number if student.id_number else '未設置' }}</p>
+                        <p><strong>聯繫電話：</strong>{{ student.phone if student.phone else '未設置' }}</p>
+                        <p><strong>電子郵件：</strong>{{ student.email if student.email else '未設置' }}</p>
+                        <p><strong>學籍狀態：</strong>
+                            <span class="badge {% if student.status == '在學' %}bg-success{% elif student.status == '休學' %}bg-warning{% elif student.status == '退學' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ student.status }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                {% if student.address %}
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>地址：</strong>{{ student.address }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 學籍信息 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>學籍信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>所屬班級：</strong>
+                            {% if student.class_info %}
+                                <a href="{{ url_for('class_management.view_class', class_id=student.class_info.class_id) }}">
+                                    {{ student.class_info.class_name }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">未分配班級</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>入學日期：</strong>{{ student.enrollment_date.strftime('%Y-%m-%d') if student.enrollment_date else '未設置' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if student.class_info %}
+                        <p><strong>年級：</strong>{{ student.class_info.grade }}</p>
+                        <p><strong>院系：</strong>{{ student.class_info.department.department_name if student.class_info.department else '未設置' }}</p>
+                        <p><strong>班主任：</strong>{{ student.class_info.teacher.name if student.class_info.teacher else '未設置' }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系統信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>系統信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if student.created_at %}
+                        <p><strong>創建時間：</strong>{{ student.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if student.updated_at %}
+                        <p><strong>更新時間：</strong>{{ student.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- 快速操作 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>快速操作</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('student_management.edit_student', student_id=student.student_id) }}" class="btn btn-outline-warning">
+                        <i class="fas fa-edit"></i> 編輯學生信息
+                    </a>
+                    {% if student.class_info %}
+                    <a href="{{ url_for('class_management.view_class', class_id=student.class_info.class_id) }}" class="btn btn-outline-info">
+                        <i class="fas fa-users"></i> 查看所屬班級
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('student_management.edit_student', student_id=student.student_id) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> 分配班級
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 學生統計 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>相關統計</h5>
+            </div>
+            <div class="card-body">
+                {% if student.class_info %}
+                <p><strong>同班同學：</strong>{{ student.class_info.students|length - 1 }} 人</p>
+                {% endif %}
+                <p><strong>學籍狀態：</strong>{{ student.status }}</p>
+                {% if student.enrollment_date %}
+                <p><strong>在校時間：</strong>
+                    {% set days_enrolled = (now().date() - student.enrollment_date).days %}
+                    {% if days_enrolled > 365 %}
+                        {{ (days_enrolled / 365)|round(1) }} 年
+                    {% else %}
+                        {{ days_enrolled }} 天
+                    {% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

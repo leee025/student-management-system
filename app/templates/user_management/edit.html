@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">{{ title }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.username.label(class="form-label") }}
+                                {{ form.username(class="form-control") }}
+                                {% for error in form.username.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.role.label(class="form-label") }}
+                                {{ form.role(class="form-select") }}
+                                {% for error in form.role.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                                {% if current_user.role != 'admin' %}
+                                <small class="form-text text-muted">只有管理員可以修改角色</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.password.label(class="form-label") }}
+                                {{ form.password(class="form-control") }}
+                                {% for error in form.password.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                                {% if user %}
+                                <small class="form-text text-muted">留空則不修改密碼</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.confirm_password.label(class="form-label") }}
+                                {{ form.confirm_password(class="form-control") }}
+                                {% for error in form.confirm_password.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.related_id.label(class="form-label") }}
+                                {{ form.related_id(class="form-control") }}
+                                {% for error in form.related_id.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                                <small class="form-text text-muted">{{ form.related_id.description }}</small>
+                                {% if current_user.role != 'admin' %}
+                                <small class="form-text text-muted">只有管理員可以修改關聯ID</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.is_active(class="form-check-input") }}
+                                    {{ form.is_active.label(class="form-check-label") }}
+                                </div>
+                                {% for error in form.is_active.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                                {% if current_user.role != 'admin' %}
+                                <small class="form-text text-muted">只有管理員可以修改啟用狀態</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('user_management.list_users') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> 返回列表
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('user_management.view_user', user_id=current_user.user_id) }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> 返回
+                            </a>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            {% if user %}
+                            <a href="{{ url_for('user_management.change_password', user_id=user.user_id) }}" 
+                               class="btn btn-outline-primary me-2">
+                                <i class="fas fa-key"></i> 變更密碼
+                            </a>
+                            {% endif %}
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 根據角色顯示相關提示
+document.getElementById('role').addEventListener('change', function() {
+    const relatedIdField = document.getElementById('related_id');
+    const relatedIdHelp = relatedIdField.nextElementSibling;
+    
+    switch(this.value) {
+        case 'teacher':
+            relatedIdHelp.textContent = '請輸入教師ID';
+            break;
+        case 'student':
+            relatedIdHelp.textContent = '請輸入學生ID';
+            break;
+        case 'admin':
+        case 'staff':
+            relatedIdHelp.textContent = '可選，用於關聯其他系統資料';
+            break;
+    }
+});
+</script>
+{% endblock %}

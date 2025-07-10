@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>學生詳情</h2>
+    <div>
+        <a href="{{ url_for('student_management.edit_student', student_id=student.student_id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> 編輯
+        </a>
+        <form method="post" action="{{ url_for('student_management.delete_student', student_id=student.student_id) }}" 
+              class="d-inline" onsubmit="return confirm('確定要刪除該學生嗎？');">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> 刪除
+            </button>
+        </form>
+        <a href="{{ url_for('student_management.list_students') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title">基本資訊</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>學號:</strong> {{ student.student_id }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>姓名:</strong> {{ student.name }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>性別:</strong> {{ student.gender }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>出生日期:</strong> {{ student.birth_date|default('未填寫', true) }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>身份證號:</strong> {{ student.id_number|default('未填寫', true) }}
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h5 class="card-title">學籍資訊</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>班級:</strong> {{ student.class_info.class_name if student.class_info else '未分配' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>狀態:</strong> {{ student.status }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>入學日期:</strong> {{ student.enrollment_date|default('未填寫', true) }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>創建時間:</strong> {{ student.created_at }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>更新時間:</strong> {{ student.updated_at }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h5 class="card-title">聯繫方式</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>地址:</strong> {{ student.address|default('未填寫', true) }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>電話:</strong> {{ student.phone|default('未填寫', true) }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>郵箱:</strong> {{ student.email|default('未填寫', true) }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

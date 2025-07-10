@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ title }}</h2>
+    <div>
+        <a href="{{ url_for('teacher_management.edit_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> 編輯
+        </a>
+        <form method="post" action="{{ url_for('teacher_management.delete_teacher', teacher_id=teacher.teacher_id) }}" 
+              class="d-inline" onsubmit="return confirm('確定要刪除該教師嗎？');">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> 刪除
+            </button>
+        </form>
+        <a href="{{ url_for('teacher_management.list_teachers') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- 教師基本信息 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>基本信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>教師編號：</strong>{{ teacher.teacher_id }}</p>
+                        <p><strong>姓名：</strong>{{ teacher.name }}</p>
+                        <p><strong>性別：</strong>{{ teacher.gender }}</p>
+                        <p><strong>出生日期：</strong>{{ teacher.birth_date.strftime('%Y-%m-%d') if teacher.birth_date else '未設置' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>聯繫電話：</strong>{{ teacher.phone if teacher.phone else '未設置' }}</p>
+                        <p><strong>電子郵件：</strong>{{ teacher.email if teacher.email else '未設置' }}</p>
+                        <p><strong>職位：</strong>{{ teacher.position if teacher.position else '未設置' }}</p>
+                        <p><strong>入職日期：</strong>{{ teacher.hire_date.strftime('%Y-%m-%d') if teacher.hire_date else '未設置' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工作信息 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>工作信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>所屬院系：</strong>
+                            {% if teacher.department %}
+                                {{ teacher.department.department_name }}
+                            {% else %}
+                                <span class="text-muted">未分配院系</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>薪資：</strong>
+                            {% if teacher.salary %}
+                                ¥{{ "{:,.2f}".format(teacher.salary) }}
+                            {% else %}
+                                <span class="text-muted">未設置</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if teacher.hire_date %}
+                        <p><strong>工作年限：</strong>
+                            {% set work_years = ((now().date() - teacher.hire_date).days / 365)|round(1) %}
+                            {{ work_years }} 年
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if teacher.notes %}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p><strong>備註：</strong></p>
+                        <div class="border rounded p-2 bg-light">
+                            {{ teacher.notes|nl2br|safe }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 擔任班主任的班級 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i>擔任班主任</h5>
+            </div>
+            <div class="card-body">
+                {% if teacher.classes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>班級名稱</th>
+                                <th>年級</th>
+                                <th>學生人數</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for class_obj in teacher.classes %}
+                            <tr>
+                                <td>{{ class_obj.class_name }}</td>
+                                <td>{{ class_obj.grade }}</td>
+                                <td>{{ class_obj.students|length }}</td>
+                                <td>
+                                    <a href="{{ url_for('class_management.view_class', class_id=class_obj.class_id) }}" 
+                                       class="btn btn-sm btn-info" title="檢視班級">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">該教師暫未擔任任何班級的班主任</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 系統信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>系統信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if teacher.created_at %}
+                        <p><strong>創建時間：</strong>{{ teacher.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if teacher.updated_at %}
+                        <p><strong>更新時間：</strong>{{ teacher.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- 快速操作 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>快速操作</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('teacher_management.edit_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-outline-warning">
+                        <i class="fas fa-edit"></i> 編輯教師信息
+                    </a>
+                    <a href="{{ url_for('class_management.add_class') }}?teacher_id={{ teacher.teacher_id }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> 新增班級
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 教師統計 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>相關統計</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>擔任班主任：</strong>{{ teacher.classes|length }} 個班級</p>
+                {% if teacher.classes %}
+                <p><strong>管理學生：</strong>
+                    {% set total_students = 0 %}
+                    {% for class_obj in teacher.classes %}
+                        {% set total_students = total_students + class_obj.students|length %}
+                    {% endfor %}
+                    {{ total_students }} 人
+                </p>
+                {% endif %}
+                {% if teacher.department %}
+                <p><strong>同院系教師：</strong>{{ teacher.department.teachers|length - 1 }} 人</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

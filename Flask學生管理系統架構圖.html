@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask學生管理系統 - 專案架構與開發流程</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .mindmap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 5px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .section.structure { border-left-color: #3498db; }
+        .section.models { border-left-color: #e74c3c; }
+        .section.business { border-left-color: #2ecc71; }
+        .section.frontend { border-left-color: #f39c12; }
+        .section.development { border-left-color: #9b59b6; }
+        .section.permissions { border-left-color: #1abc9c; }
+        .section.technical { border-left-color: #34495e; }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h2::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 12px;
+            background: currentColor;
+        }
+        
+        .subsection {
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .subsection h3 {
+            color: #495057;
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .item-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .item-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .item-list li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #6c757d;
+            font-size: 0.8em;
+        }
+        
+        .code {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            color: #495057;
+            border-left: 3px solid #007bff;
+            margin: 10px 0;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 1px solid #dee2e6;
+        }
+        
+        .highlight h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .step {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .step:hover {
+            border-color: #007bff;
+            transform: scale(1.02);
+        }
+        
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .mindmap {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Flask學生管理系統</h1>
+            <p>專案架構與開發流程完整指南</p>
+        </div>
+        
+        <div class="content">
+            <div class="mindmap">
+                <!-- 專案結構 -->
+                <div class="section structure">
+                    <h2>🏗️ 專案結構</h2>
+                    <div class="subsection">
+                        <h3>核心配置</h3>
+                        <ul class="item-list">
+                            <li><strong>config.py</strong> - 數據庫連接、安全密鑰、分頁設置</li>
+                            <li><strong>manage.py</strong> - 數據庫初始化、創建管理員、Flask命令行</li>
+                            <li><strong>requirements.txt</strong> - Flask核心、SQLAlchemy ORM、Flask-Login、Flask-WTF</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h3>應用工廠</h3>
+                        <ul class="item-list">
+                            <li><strong>app/__init__.py</strong> - Flask實例化、擴展初始化、藍圖註冊、全局配置</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 數據模型層 -->
+                <div class="section models">
+                    <h2>📊 數據模型層</h2>
+                    <div class="subsection">
+                        <h3>app/models/__init__.py</h3>
+                        <ul class="item-list">
+                            <li><strong>User</strong> - 認證功能、角色管理、密碼加密</li>
+                            <li><strong>Student</strong> - 學籍信息、個人資料、班級關聯</li>
+                            <li><strong>Teacher</strong> - 職員信息、部門關聯、班級管理</li>
+                            <li><strong>Class</strong> - 班級信息、師生關聯、部門歸屬</li>
+                            <li><strong>Department</strong> - 組織架構、層級管理</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 業務邏輯層 -->
+                <div class="section business">
+                    <h2>⚙️ 業務邏輯層</h2>
+                    <div class="subsection">
+                        <h3>認證模組 (app/auth/)</h3>
+                        <ul class="item-list">
+                            <li><strong>routes.py</strong> - 登錄/登出、用戶註冊、會話管理</li>
+                            <li><strong>forms.py</strong> - 登錄表單、註冊表單、字段驗證</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h3>學生管理 (app/student/)</h3>
+                        <ul class="item-list">
+                            <li><strong>routes.py</strong> - 學生列表、新增學生、編輯學生、查看詳情</li>
+                            <li><strong>forms.py</strong> - 學生信息表單、搜索表單、驗證規則</li>
+                            <li><strong>decorators.py</strong> - 角色檢查、數據過濾、訪問控制</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h3>其他管理模組</h3>
+                        <ul class="item-list">
+                            <li><strong>app/teacher/</strong> - 教師CRUD、表單管理、權限裝飾器</li>
+                            <li><strong>app/classes/</strong> - 班級操作、班級表單、訪問控制</li>
+                            <li><strong>app/user_management/</strong> - 用戶CRUD、用戶表單、管理權限</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 前端展示層 -->
+                <div class="section frontend">
+                    <h2>🎨 前端展示層</h2>
+                    <div class="subsection">
+                        <h3>模板系統 (app/templates/)</h3>
+                        <ul class="item-list">
+                            <li><strong>base.html</strong> - 導航結構、樣式引入、JavaScript載入</li>
+                            <li><strong>auth/</strong> - 登錄頁面、註冊頁面</li>
+                            <li><strong>student/</strong> - 列表頁面、詳情頁面、表單頁面</li>
+                            <li><strong>teacher/、classes/、user_management/</strong> - 各功能模組頁面</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h3>靜態資源 (app/static/)</h3>
+                        <ul class="item-list">
+                            <li>CSS樣式、JavaScript腳本、圖片資源</li>
+                        </ul>
+                    </div>
+                </div>

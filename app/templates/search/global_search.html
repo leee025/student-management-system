@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-search me-2"></i>全局搜尋
+            </h2>
+            
+            <!-- 搜尋表單 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="searchForm" class="row g-3">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text"
+                                       class="form-control"
+                                       id="searchInput"
+                                       placeholder="請輸入學號、姓名、班級名稱或其他關鍵字..."
+                                       value="{{ initial_query or '' }}"
+                                       autocomplete="off">
+                                <div id="suggestions" class="position-absolute bg-white border rounded shadow-sm" 
+                                     style="top: 100%; left: 0; right: 0; z-index: 1000; display: none; max-height: 200px; overflow-y: auto;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="searchType">
+                                <option value="all">全部</option>
+                                <option value="student">學生</option>
+                                <option value="teacher">教師</option>
+                                <option value="class">班級</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 載入指示器 -->
+            <div id="loadingIndicator" class="text-center py-4" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">搜尋中...</span>
+                </div>
+                <p class="mt-2 text-muted">正在搜尋...</p>
+            </div>
+            
+            <!-- 搜尋結果 -->
+            <div id="searchResults" style="display: none;">
+                <!-- 結果統計 -->
+                <div class="alert alert-info" id="resultStats"></div>
+                
+                <!-- 學生結果 -->
+                <div id="studentResults" class="mb-4" style="display: none;">
+                    <h4 class="border-bottom pb-2">
+                        <i class="fas fa-user-graduate me-2"></i>學生
+                        <span class="badge bg-primary ms-2" id="studentCount">0</span>
+                    </h4>
+                    <div class="row" id="studentList"></div>
+                </div>
+                
+                <!-- 教師結果 -->
+                <div id="teacherResults" class="mb-4" style="display: none;">
+                    <h4 class="border-bottom pb-2">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>教師
+                        <span class="badge bg-success ms-2" id="teacherCount">0</span>
+                    </h4>
+                    <div class="row" id="teacherList"></div>
+                </div>
+                
+                <!-- 班級結果 -->
+                <div id="classResults" class="mb-4" style="display: none;">
+                    <h4 class="border-bottom pb-2">
+                        <i class="fas fa-users me-2"></i>班級
+                        <span class="badge bg-warning ms-2" id="classCount">0</span>
+                    </h4>
+                    <div class="row" id="classList"></div>
+                </div>
+                
+                <!-- 無結果提示 -->
+                <div id="noResults" class="alert alert-warning text-center" style="display: none;">
+                    <i class="fas fa-search me-2"></i>
+                    沒有找到符合條件的結果，請嘗試其他關鍵字。
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.search-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.search-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-category {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const searchType = document.getElementById('searchType');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const searchResults = document.getElementById('searchResults');
+    const suggestions = document.getElementById('suggestions');
+
+    let searchTimeout;
+    let suggestionTimeout;
+
+    // 如果有初始查詢，自動執行搜尋
+    const initialQuery = searchInput.value.trim();
+    if (initialQuery) {
+        performSearch();
+    }
+    
+    // 搜尋表單提交
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        performSearch();
+    });
+    
+    // 即時搜尋
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        
+        if (query.length >= 2) {
+            searchTimeout = setTimeout(() => {
+                performSearch();
+            }, 500);
+        } else {
+            hideResults();
+        }
+        
+        // 搜尋建議
+        clearTimeout(suggestionTimeout);
+        if (query.length >= 2) {
+            suggestionTimeout = setTimeout(() => {
+                fetchSuggestions(query);
+            }, 300);
+        } else {
+            hideSuggestions();
+        }
+    });
+    
+    // 隱藏建議當點擊其他地方
+    document.addEventListener('click', function(e) {
+        if (!suggestions.contains(e.target) && e.target !== searchInput) {
+            hideSuggestions();
+        }
+    });
+    
+    function performSearch() {
+        const query = searchInput.value.trim();
+        const type = searchType.value;
+        
+        if (!query) {
+            hideResults();
+            return;
+        }
+        
+        showLoading();
+        hideSuggestions();
+        
+        fetch(`/search/api?q=${encodeURIComponent(query)}&type=${type}`)
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                displayResults(data, query);
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('搜尋錯誤:', error);
+                showError('搜尋時發生錯誤，請稍後再試。');
+            });
+    }
+    
+    function fetchSuggestions(query) {
+        fetch(`/search/suggestions?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                displaySuggestions(data);
+            })
+            .catch(error => {
+                console.error('獲取建議時發生錯誤:', error);
+            });
+    }
+    
+    function displaySuggestions(suggestions_data) {
+        if (suggestions_data.length === 0) {
+            hideSuggestions();
+            return;
+        }
+        
+        const html = suggestions_data.map(item => `
+            <div class="suggestion-item" onclick="selectSuggestion('${item.id}', '${item.type}')">
+                <div>${item.text}</div>
+                <small class="suggestion-category">${item.category}</small>
+            </div>
+        `).join('');
+        
+        suggestions.innerHTML = html;
+        suggestions.style.display = 'block';
+    }
+    
+    function selectSuggestion(id, type) {
+        hideSuggestions();
+        
+        // 根據類型跳轉到詳情頁面
+        if (type === 'student') {
+            window.location.href = `/students/${id}`;
+        } else if (type === 'teacher') {
+            window.location.href = `/teachers/${id}`;
+        } else if (type === 'class') {
+            window.location.href = `/classes/${id}`;
+        }
+    }
+    
+    function displayResults(data, query) {
+        document.getElementById('resultStats').textContent = 
+            `找到 ${data.total} 個結果，關鍵字："${query}"`;
+        
+        // 顯示學生結果
+        if (data.students.length > 0) {
+            displayStudents(data.students);
+            document.getElementById('studentResults').style.display = 'block';
+            document.getElementById('studentCount').textContent = data.students.length;
+        } else {
+            document.getElementById('studentResults').style.display = 'none';
+        }
+        
+        // 顯示教師結果
+        if (data.teachers.length > 0) {
+            displayTeachers(data.teachers);
+            document.getElementById('teacherResults').style.display = 'block';
+            document.getElementById('teacherCount').textContent = data.teachers.length;
+        } else {
+            document.getElementById('teacherResults').style.display = 'none';
+        }
+        
+        // 顯示班級結果
+        if (data.classes.length > 0) {
+            displayClasses(data.classes);
+            document.getElementById('classResults').style.display = 'block';
+            document.getElementById('classCount').textContent = data.classes.length;
+        } else {
+            document.getElementById('classResults').style.display = 'none';
+        }
+        
+        // 顯示結果或無結果提示
+        if (data.total > 0) {
+            document.getElementById('searchResults').style.display = 'block';
+            document.getElementById('noResults').style.display = 'none';
+        } else {
+            document.getElementById('searchResults').style.display = 'block';
+            document.getElementById('noResults').style.display = 'block';
+        }
+    }
+    
+    function displayStudents(students) {
+        const html = students.map(student => `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card search-card h-100" onclick="window.location.href='/students/${student.student_id}'">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-user-graduate me-2"></i>${student.name}
+                        </h6>
+                        <p class="card-text">
+                            <small class="text-muted">學號：${student.student_id}</small><br>
+                            <small class="text-muted">班級：${student.class_name}</small><br>
+                            <small class="text-muted">狀態：${student.status || '未設置'}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('studentList').innerHTML = html;
+    }
+    
+    function displayTeachers(teachers) {
+        const html = teachers.map(teacher => `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card search-card h-100" onclick="window.location.href='/teachers/${teacher.teacher_id}'">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-chalkboard-teacher me-2"></i>${teacher.name}
+                        </h6>
+                        <p class="card-text">
+                            <small class="text-muted">編號：${teacher.teacher_id}</small><br>
+                            <small class="text-muted">部門：${teacher.department_name}</small><br>
+                            <small class="text-muted">職位：${teacher.position || '未設置'}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('teacherList').innerHTML = html;
+    }
+    
+    function displayClasses(classes) {
+        const html = classes.map(cls => `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card search-card h-100" onclick="window.location.href='/classes/${cls.class_id}'">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-users me-2"></i>${cls.class_name}
+                        </h6>
+                        <p class="card-text">
+                            <small class="text-muted">年級：${cls.grade}</small><br>
+                            <small class="text-muted">部門：${cls.department_name}</small><br>
+                            <small class="text-muted">班導師：${cls.teacher_name}</small><br>
+                            <small class="text-muted">學生數：${cls.student_count} 人</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('classList').innerHTML = html;
+    }
+    
+    function showLoading() {
+        loadingIndicator.style.display = 'block';
+        searchResults.style.display = 'none';
+    }
+    
+    function hideLoading() {
+        loadingIndicator.style.display = 'none';
+    }
+    
+    function hideResults() {
+        searchResults.style.display = 'none';
+    }
+    
+    function hideSuggestions() {
+        suggestions.style.display = 'none';
+    }
+    
+    function showError(message) {
+        const errorHtml = `
+            <div class="alert alert-danger text-center">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${message}
+            </div>
+        `;
+        searchResults.innerHTML = errorHtml;
+        searchResults.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

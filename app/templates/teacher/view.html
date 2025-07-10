@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>老師詳情</h2>
+    <a href="{{ url_for('teacher_management.list_teachers') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 返回列表
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>基本資訊</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th width="30%">教師編號</th>
+                        <td>{{ teacher.teacher_id }}</td>
+                    </tr>
+                    <tr>
+                        <th>姓名</th>
+                        <td>{{ teacher.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>性別</th>
+                        <td>{{ teacher.gender }}</td>
+                    </tr>
+                    <tr>
+                        <th>出生日期</th>
+                        <td>{{ teacher.birth_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>身份證號</th>
+                        <td>{{ teacher.id_number }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h4>聯繫方式</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th width="30%">地址</th>
+                        <td>{{ teacher.address }}</td>
+                    </tr>
+                    <tr>
+                        <th>電話</th>
+                        <td>{{ teacher.phone }}</td>
+                    </tr>
+                    <tr>
+                        <th>電子郵件</th>
+                        <td>{{ teacher.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>部門</th>
+                        <td>{{ teacher.department.department_name if teacher.department }}</td>
+                    </tr>
+                    <tr>
+                        <th>職位</th>
+                        <td>{{ teacher.position }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{{ url_for('teacher_management.edit_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> 編輯
+            </a>
+            <form method="post" action="{{ url_for('teacher_management.delete_teacher', teacher_id=teacher.teacher_id) }}" 
+                  class="d-inline" onsubmit="return confirm('確定要刪除該老師嗎？');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> 刪除
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

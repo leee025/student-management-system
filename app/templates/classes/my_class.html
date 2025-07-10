@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 頁面標題 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-school me-2"></i>我的班級</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首頁</a></li>
+                <li class="breadcrumb-item active">我的班級</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- 班級基本信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>班級資訊</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">班級名稱：</th>
+                            <td>{{ class_obj.class_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>年級：</th>
+                            <td>{{ class_obj.grade }}年級</td>
+                        </tr>
+                        <tr>
+                            <th>所屬系所：</th>
+                            <td>{{ class_obj.department.department_name if class_obj.department else '未設定' }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">班主任：</th>
+                            <td>{{ class_obj.teacher.name if class_obj.teacher else '未指派' }}</td>
+                        </tr>
+                        <tr>
+                            <th>班級人數：</th>
+                            <td>{{ class_obj.students|length }}人</td>
+                        </tr>
+                        <tr>
+                            <th>我的學號：</th>
+                            <td><span class="badge bg-primary">{{ student.student_id }}</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 班主任信息 -->
+    {% if class_obj.teacher %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>班主任資訊</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">姓名：</th>
+                            <td>{{ class_obj.teacher.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>教師編號：</th>
+                            <td>{{ class_obj.teacher.teacher_id }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">聯繫電話：</th>
+                            <td>{{ class_obj.teacher.phone if class_obj.teacher.phone else '未提供' }}</td>
+                        </tr>
+                        <tr>
+                            <th>電子郵箱：</th>
+                            <td>{{ class_obj.teacher.email if class_obj.teacher.email else '未提供' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 同班同學列表 -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-users me-2"></i>同班同學</h5>
+        </div>
+        <div class="card-body">
+            {% if class_obj.students %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>學號</th>
+                            <th>姓名</th>
+                            <th>性別</th>
+                            <th>狀態</th>
+                            <th>聯繫方式</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for classmate in class_obj.students %}
+                        <tr {% if classmate.student_id == student.student_id %}class="table-primary"{% endif %}>
+                            <td>
+                                {{ classmate.student_id }}
+                                {% if classmate.student_id == student.student_id %}
+                                <span class="badge bg-success ms-2">我</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ classmate.name }}</td>
+                            <td>{{ classmate.gender }}</td>
+                            <td>
+                                {% if classmate.status == '在學' %}
+                                <span class="badge bg-success">{{ classmate.status }}</span>
+                                {% elif classmate.status == '休學' %}
+                                <span class="badge bg-warning">{{ classmate.status }}</span>
+                                {% elif classmate.status == '退學' %}
+                                <span class="badge bg-danger">{{ classmate.status }}</span>
+                                {% elif classmate.status == '畢業' %}
+                                <span class="badge bg-info">{{ classmate.status }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ classmate.status or '未設定' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if classmate.email %}
+                                <a href="mailto:{{ classmate.email }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                {% endif %}
+                                {% if classmate.phone %}
+                                <a href="tel:{{ classmate.phone }}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                                {% endif %}
+                                {% if not classmate.email and not classmate.phone %}
+                                <span class="text-muted">無</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>班級暫無學生資料
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// 高亮顯示當前學生的行
+document.addEventListener('DOMContentLoaded', function() {
+    const currentStudentRow = document.querySelector('.table-primary');
+    if (currentStudentRow) {
+        currentStudentRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+</script>
+{% endblock %}

@@ -144,7 +144,7 @@ def create_app(config_class=Config):
             str: 渲染後的HTML頁面
         """
         from app.models import Teacher, Student, Class, User, Department
-        from datetime import datetime, timedelta, timezone
+        from datetime import datetime, timedelta
 
         # 收集基本統計數據
         # 統計各類實體的總數量
@@ -157,7 +157,7 @@ def create_app(config_class=Config):
         }
 
         # 計算最近一週新增的學生數量
-        week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+        week_ago = datetime.now() - timedelta(days=7)
         stats['new_students_this_week'] = Student.query.filter(
             Student.created_at >= week_ago
         ).count()

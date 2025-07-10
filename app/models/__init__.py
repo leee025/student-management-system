@@ -10,10 +10,10 @@ from app import db, login_manager
 
 def get_current_time():
     """
-    獲取當前 UTC 時間
-    使用時區感知的 datetime 對象
+    獲取當前本地時間
+    使用系統本地時間，適合台灣地區使用
     """
-    return datetime.now(timezone.utc)
+    return datetime.now()
 
 @login_manager.user_loader
 def load_user(id):

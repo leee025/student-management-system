@@ -94,12 +94,12 @@
                 <div class="row">
                     <div class="col-md-6">
                         {% if student.created_at %}
-                        <p><strong>創建時間：</strong>{{ student.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p><strong>創建時間：</strong>{{ student.created_at|local_time }}</p>
                         {% endif %}
                     </div>
                     <div class="col-md-6">
                         {% if student.updated_at %}
-                        <p><strong>更新時間：</strong>{{ student.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p><strong>更新時間：</strong>{{ student.updated_at|local_time }}</p>
                         {% endif %}
                     </div>
                 </div>

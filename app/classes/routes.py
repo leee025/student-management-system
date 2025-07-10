@@ -116,7 +116,7 @@ def edit_class(class_id):
             class_obj.department_id = form.department_id.data if form.department_id.data != 0 else None
             class_obj.teacher_id = form.teacher_id.data if form.teacher_id.data != '' else None
             class_obj.description = form.description.data
-            class_obj.updated_at = datetime.utcnow()
+            class_obj.updated_at = datetime.now()
 
             db.session.commit()
 

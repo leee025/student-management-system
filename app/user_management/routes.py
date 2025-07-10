@@ -43,7 +43,7 @@ def add_user():
                 role=form.role.data,
                 related_id=form.related_id.data if form.related_id.data else None,
                 is_active=form.is_active.data,
-                created_at=datetime.utcnow()
+                created_at=datetime.now()
             )
             user.set_password(form.password.data)
             
@@ -108,7 +108,7 @@ def edit_user(user_id):
             if form.password.data:
                 user.set_password(form.password.data)
             
-            user.updated_at = datetime.utcnow()
+            user.updated_at = datetime.now()
             db.session.commit()
             flash('使用者資訊更新成功', 'success')
             
@@ -178,7 +178,7 @@ def change_password(user_id):
                                          user=user)
             
             user.set_password(form.new_password.data)
-            user.updated_at = datetime.utcnow()
+            user.updated_at = datetime.now()
             db.session.commit()
             flash('密碼變更成功', 'success')
             

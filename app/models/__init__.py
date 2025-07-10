@@ -3,10 +3,17 @@
 包含學生管理系統的所有數據表模型
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login_manager
+
+def get_current_time():
+    """
+    獲取當前 UTC 時間
+    使用時區感知的 datetime 對象
+    """
+    return datetime.now(timezone.utc)
 
 @login_manager.user_loader
 def load_user(id):
@@ -51,11 +58,11 @@ class User(UserMixin, db.Model):
     # 最後登錄時間
     last_login = db.Column(db.TIMESTAMP)
 
-    # 創建時間：使用數據庫默認值
-    created_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
+    # 創建時間：使用應用伺服器時間
+    created_at = db.Column(db.TIMESTAMP, default=get_current_time)
 
     # 更新時間：創建時使用默認值，更新時自動更新
-    updated_at = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    updated_at = db.Column(db.TIMESTAMP, default=get_current_time, onupdate=get_current_time)
 
     def get_id(self):
         """
@@ -140,10 +147,10 @@ class Student(db.Model):
     id_number = db.Column(db.String(18))
 
     # 記錄創建時間
-    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
+    created_at = db.Column(db.TIMESTAMP, default=get_current_time)
 
     # 記錄更新時間
-    updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.TIMESTAMP, default=get_current_time, onupdate=get_current_time)
 
     # 關聯關係：學生所屬班級
     # backref='students' 在Class模型中創建反向關係
@@ -266,10 +273,10 @@ class Teacher(db.Model):
     notes = db.Column(db.Text)
 
     # 記錄創建時間
-    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
+    created_at = db.Column(db.TIMESTAMP, default=get_current_time)
 
     # 記錄更新時間
-    updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.TIMESTAMP, default=get_current_time, onupdate=get_current_time)
 
     # 關聯關係：教師所屬部門
     # backref='teachers' 在Department模型中創建反向關係

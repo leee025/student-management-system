@@ -11,7 +11,7 @@ from . import bp
 from .forms import ClassForm
 from .decorators import admin_or_teacher_required, admin_required, can_edit_class, can_view_class
 from app.models import Class, Department, Teacher, Student
-from datetime import datetime
+from datetime import datetime, timezone
 
 @bp.route('/')
 @login_required
@@ -62,7 +62,7 @@ def add_class():
                 grade=form.grade.data,
                 department_id=form.department_id.data if form.department_id.data != 0 else None,
                 teacher_id=form.teacher_id.data if form.teacher_id.data != '' else None,
-                created_at=datetime.utcnow()
+                created_at=datetime.now(timezone.utc)
             )
             
             db.session.add(class_obj)

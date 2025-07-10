@@ -7,7 +7,7 @@ Flask應用管理腳本
 from flask.cli import FlaskGroup
 from flask_migrate import Migrate
 from app import create_app, db
-from datetime import datetime
+from datetime import datetime, timezone
 
 # 創建Flask應用實例
 app = create_app()
@@ -42,7 +42,7 @@ def create_admin():
         username='admin',           # 用戶名
         role='admin',              # 角色：管理員
         is_active=True,            # 賬戶狀態：啟用
-        last_login=datetime.utcnow(),  # 最後登錄時間
+        last_login=datetime.now(timezone.utc),  # 最後登錄時間
     )
 
     # 設置密碼（會自動進行哈希加密）

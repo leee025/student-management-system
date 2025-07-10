@@ -13,7 +13,7 @@ from app.teacher.decorators import (admin_required, admin_or_self_required,
                         can_edit_teacher, can_view_teacher,
                         can_view_teacher_list, filter_teachers_by_permission)
 from app.models import Teacher, Department
-from datetime import datetime
+from datetime import datetime, timezone
 
 @bp.route('/')
 @login_required
@@ -88,7 +88,7 @@ def add_teacher():
                 hire_date=form.hire_date.data,
                 salary=form.salary.data,
                 notes=form.notes.data,
-                created_at=datetime.utcnow()
+                created_at=datetime.now(timezone.utc)
             )
 
             db.session.add(teacher)
@@ -142,7 +142,7 @@ def edit_teacher(teacher_id):
             teacher.hire_date = form.hire_date.data
             teacher.salary = form.salary.data
             teacher.notes = form.notes.data
-            teacher.updated_at = datetime.utcnow()
+            teacher.updated_at = datetime.now(timezone.utc)
 
             db.session.commit()
 

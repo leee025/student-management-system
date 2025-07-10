@@ -13,7 +13,7 @@ from app.student.decorators import (admin_or_teacher_required, admin_required,
                         can_edit_student, can_view_student,
                         can_view_student_list, filter_students_by_permission)
 from app.models import Student, Class
-from datetime import datetime
+from datetime import datetime, timezone
 
 @bp.route('/')
 @login_required
@@ -96,7 +96,7 @@ def add_student():
                 enrollment_date=form.enrollment_date.data,
                 status=form.status.data,
                 id_number=form.id_number.data,
-                created_at=datetime.utcnow()
+                created_at=datetime.now(timezone.utc)
             )
 
             db.session.add(student)
@@ -155,7 +155,7 @@ def edit_student(student_id):
             student.status = form.status.data
             student.id_number = form.id_number.data
             student.notes = form.notes.data
-            student.updated_at = datetime.utcnow()
+            student.updated_at = datetime.now(timezone.utc)
 
             db.session.commit()
 

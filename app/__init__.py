@@ -68,6 +68,44 @@ def create_app(config_class=Config):
         # 將 \n 和 \r\n 轉換為 <br>
         return re.sub(r'\r?\n', '<br>', str(text))
 
+    @app.template_filter('local_time')
+    def local_time_filter(utc_time):
+        """將 UTC 時間轉換為台灣本地時間 (UTC+8)"""
+        if not utc_time:
+            return ''
+
+        from datetime import timezone, timedelta
+
+        # 如果時間沒有時區信息，假設它是 UTC
+        if utc_time.tzinfo is None:
+            utc_time = utc_time.replace(tzinfo=timezone.utc)
+
+        # 轉換為台灣時間 (UTC+8)
+        taiwan_tz = timezone(timedelta(hours=8))
+        local_time = utc_time.astimezone(taiwan_tz)
+
+        # 返回格式化的時間字符串
+        return local_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    @app.template_filter('local_date')
+    def local_date_filter(utc_time):
+        """將 UTC 時間轉換為台灣本地日期"""
+        if not utc_time:
+            return ''
+
+        from datetime import timezone, timedelta
+
+        # 如果時間沒有時區信息，假設它是 UTC
+        if utc_time.tzinfo is None:
+            utc_time = utc_time.replace(tzinfo=timezone.utc)
+
+        # 轉換為台灣時間 (UTC+8)
+        taiwan_tz = timezone(timedelta(hours=8))
+        local_time = utc_time.astimezone(taiwan_tz)
+
+        # 返回格式化的日期字符串
+        return local_time.strftime('%Y-%m-%d')
+
     # 註冊藍圖（Blueprint）
     # 藍圖是Flask中組織路由和視圖的方式，有助於模組化應用結構
 
@@ -106,7 +144,7 @@ def create_app(config_class=Config):
             str: 渲染後的HTML頁面
         """
         from app.models import Teacher, Student, Class, User, Department
-        from datetime import datetime, timedelta
+        from datetime import datetime, timedelta, timezone
 
         # 收集基本統計數據
         # 統計各類實體的總數量
@@ -119,7 +157,7 @@ def create_app(config_class=Config):
         }
 
         # 計算最近一週新增的學生數量
-        week_ago = datetime.utcnow() - timedelta(days=7)
+        week_ago = datetime.now(timezone.utc) - timedelta(days=7)
         stats['new_students_this_week'] = Student.query.filter(
             Student.created_at >= week_ago
         ).count()
